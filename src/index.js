@@ -1,4 +1,4 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const name = "Baynbileg";
-console.log(`Hello, ${name}!`);
+console.log(`Hell2o, ${name}!`);
