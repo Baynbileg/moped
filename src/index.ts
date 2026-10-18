@@ -1,3 +1,3 @@
 const name: string = "Baynbileg";
 
-console.log(`Hello, ${name}!`);
+console.log(`Hel2lo, ${name}!`);
