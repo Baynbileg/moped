@@ -11,6 +11,9 @@ checkout, or payment processing yet.
 
 ## Getting started
 
+Create a `.env.local` file based on `env.example` and replace the placeholders
+with your Supabase project URL and anon key.
+
 ```sh
 npm install
 npm run dev

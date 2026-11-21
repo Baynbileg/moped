@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { getSupabase } from "./supabase";
 
 export type Product = {
   id: number;
@@ -10,29 +10,49 @@ export type Product = {
   product_type: { type: string } | null;
 };
 
-const COLUMNS =
-  "id, name, description, price, stock, image_url, product_type(type)";
+// products_names is joined through product.name_id, product_type through product.type_id
+const COLUMNS = "id, price, image_url, products_names(name), product_type(type)";
+
+type ProductRow = {
+  id: number;
+  price: number | null;
+  image_url: string | null;
+  products_names: { name: string } | null;
+  product_type: { type: string } | null;
+};
+
+function toProduct(row: ProductRow): Product {
+  return {
+    id: row.id,
+    name: row.products_names?.name ?? "Unnamed product",
+    description: null,
+    price: row.price,
+    stock: 0, // not selected yet, add the column to COLUMNS when you need it
+    image_url: row.image_url,
+    product_type: row.product_type,
+  };
+}
 
 export async function fetchProducts(): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from("products")
+  const { data, error } = await getSupabase()
+    .from("product")
     .select(COLUMNS)
     .order("id");
   if (error) throw error;
-  return (data ?? []) as unknown as Product[];
+  return ((data ?? []) as unknown as ProductRow[]).map(toProduct);
 }
 
 export async function fetchProduct(id: number): Promise<Product | null> {
-  const { data, error } = await supabase
-    .from("products")
+  const { data, error } = await getSupabase()
+    .from("product")
     .select(COLUMNS)
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
-  return data as unknown as Product | null;
+  return data ? toProduct(data as unknown as ProductRow) : null;
 }
 
-const CURRENCY = "USD"; // change to your currency code, e.g. "MNT"
+const CURRENCY = "MNT"; // change to your currency code
 
 export function formatPrice(price: number | null): string {
   if (price === null) return "";
